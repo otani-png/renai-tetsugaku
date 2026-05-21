@@ -34,9 +34,10 @@
     /* ──── 柱廊（コロネード） ──── */
     .colonnade {
       display: flex;
-      justify-content: center;
-      gap: 18px;
-      padding: 0 20px;
+      justify-content: space-between;
+      max-width: 1040px;
+      width: 100%;
+      padding: 0 2px;
       margin-bottom: 0;
     }
 
@@ -60,17 +61,17 @@
 
     .architrave {
       width: 100%;
-      max-width: 680px;
+      max-width: 1040px;
       height: 6px;
-      background: linear-gradient(to right, transparent 0%, #c4a55a 8%, #c4a55a 92%, transparent 100%);
+      background: linear-gradient(to right, transparent 0%, #c4a55a 4%, #c4a55a 96%, transparent 100%);
       margin-bottom: 0;
     }
 
     .frieze {
       width: 100%;
-      max-width: 680px;
+      max-width: 1040px;
       height: 18px;
-      background: linear-gradient(to right, transparent 0%, #d4bc8a22 8%, #d4bc8a22 92%, transparent 100%);
+      background: linear-gradient(to right, transparent 0%, #d4bc8a22 4%, #d4bc8a22 96%, transparent 100%);
       border-bottom: 1px solid #c4a55a44;
       margin-bottom: 36px;
       display: flex;
@@ -187,7 +188,8 @@
       border-left: 2px solid #c4a55a;
       padding: 20px 24px;
       margin-bottom: 12px;
-      min-height: 96px;
+      height: 178px;          /* 固定高さ — ボタン位置を安定させる */
+      overflow: hidden;
       display: flex;
       align-items: center;
       background: linear-gradient(to right, rgba(196,165,90,0.05), transparent);
@@ -232,8 +234,9 @@
       font-size: 0.73rem;
       color: #c4b89a;
       letter-spacing: 0.18em;
-      margin-bottom: 32px;
-      min-height: 1.2em;
+      margin-bottom: 28px;
+      height: 1.6em;          /* 固定高さ — 出典行でボタンがずれないよう */
+      overflow: hidden;
       font-style: italic;
       opacity: 0;
       transition: opacity 0.4s ease 0.7s;
@@ -279,70 +282,90 @@
 
     /* ──── 左パネル：人類の探究 ──── */
     .global-counter {
+      background: #faf8f3;
+      border: 1px solid #e4dac8;
+      box-shadow: 0 1px 0 #c4a55a88, 0 4px 20px rgba(80,60,30,0.09);
+      padding: 32px 16px 28px;
       text-align: center;
-      padding-top: 48px;
     }
 
     .gl-label {
-      font-size: 0.62rem;
+      font-size: 0.6rem;
       letter-spacing: 0.28em;
-      color: #c4b89a;
-      margin-bottom: 16px;
-      line-height: 1.8;
+      color: #b4a888;
+      margin-bottom: 18px;
+      line-height: 2;
+    }
+
+    .gl-divider {
+      width: 24px;
+      height: 1px;
+      background: #d4c8b0;
+      margin: 0 auto 14px;
     }
 
     .gl-num {
-      font-size: 2.4rem;
-      color: #8a7040;
+      font-size: 2.2rem;
+      color: #7a6030;
       letter-spacing: 0.04em;
       line-height: 1;
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     .gl-unit {
-      font-size: 0.65rem;
-      letter-spacing: 0.25em;
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
       color: #c4b89a;
     }
 
     /* ──── 右パネル：プロフィール・SNS ──── */
     .profile-block {
+      background: #faf8f3;
+      border: 1px solid #e4dac8;
+      box-shadow: 0 1px 0 #c4a55a88, 0 4px 20px rgba(80,60,30,0.09);
+      padding: 28px 16px;
       text-align: center;
-      padding-top: 48px;
     }
 
     .profile-icon {
       width: 72px;
       height: 72px;
       border-radius: 50%;
-      border: 1px solid #d4c8b0;
+      border: 2px solid #e4dac8;
       display: block;
-      margin: 0 auto 16px;
-      opacity: 0.88;
-      filter: sepia(0.1);
-      transition: opacity 0.2s;
+      margin: 0 auto 14px;
+      opacity: 0.9;
+      transition: opacity 0.2s, border-color 0.2s;
     }
 
-    .profile-icon:hover { opacity: 1; }
+    .profile-icon:hover { opacity: 1; border-color: #c4a55a; }
+
+    .profile-name {
+      font-size: 0.62rem;
+      letter-spacing: 0.18em;
+      color: #b4a888;
+      margin-bottom: 16px;
+    }
 
     .side-social {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      border-top: 1px solid #e8e0d0;
+      padding-top: 14px;
     }
 
     .side-social a {
       display: block;
       font-size: 0.72rem;
-      letter-spacing: 0.2em;
-      color: #a89060;
+      letter-spacing: 0.22em;
+      color: #9a8060;
       text-decoration: none;
-      border-bottom: 1px solid transparent;
-      transition: color 0.2s, border-color 0.2s;
-      padding-bottom: 1px;
+      transition: color 0.2s;
+      padding: 3px 0;
     }
 
-    .side-social a:hover { color: #c4a55a; border-color: #c4a55a; }
+    .side-social a:hover { color: #c4a55a; }
 
     /* ──── カード内：汝の思索カウンター ──── */
     .counter {
@@ -416,7 +439,7 @@
     }
 
     /* ──── レスポンシブ ──── */
-    @media (max-width: 880px) {
+    @media (max-width: 900px) {
       .page-layout {
         grid-template-columns: 1fr;
       }
@@ -424,35 +447,43 @@
         position: static;
         display: flex;
         justify-content: center;
-        padding-top: 0;
       }
-      .global-counter, .profile-block {
-        padding-top: 24px;
+      .global-counter {
         display: flex;
         align-items: center;
         gap: 20px;
+        padding: 16px 24px;
+        width: 100%;
+        max-width: 680px;
       }
-      .gl-label { margin-bottom: 0; writing-mode: horizontal-tb; }
-      .side-social { flex-direction: row; }
-      .profile-icon { margin: 0; }
-      .left-panel  { order: 2; }
-      .card        { order: 1; }
-      .right-panel { order: 3; }
+      .gl-divider { display: none; }
+      .gl-label   { margin-bottom: 0; white-space: nowrap; }
+      .gl-num     { font-size: 1.6rem; }
+      .profile-block {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 16px 24px;
+        width: 100%;
+        max-width: 680px;
+      }
+      .profile-icon { margin: 0; width: 52px; height: 52px; }
+      .profile-name { margin-bottom: 0; }
+      .side-social  { flex-direction: row; border-top: none; padding-top: 0; border-left: 1px solid #e8e0d0; padding-left: 16px; }
+      .left-panel   { order: 2; }
+      .card         { order: 1; }
+      .right-panel  { order: 3; }
     }
   </style>
 </head>
 <body>
 
-  <!-- コロネード（柱廊） -->
+  <!-- コロネード（柱廊）─ 13本でアーキトレーブ幅に揃える -->
   <div class="colonnade">
-    <div class="col"></div>
-    <div class="col"></div>
-    <div class="col"></div>
-    <div class="col"></div>
-    <div class="col"></div>
-    <div class="col"></div>
-    <div class="col"></div>
-    <div class="col"></div>
+    <div class="col"></div><div class="col"></div><div class="col"></div>
+    <div class="col"></div><div class="col"></div><div class="col"></div>
+    <div class="col"></div><div class="col"></div><div class="col"></div>
+    <div class="col"></div><div class="col"></div><div class="col"></div>
     <div class="col"></div>
   </div>
   <div class="architrave"></div>
@@ -477,6 +508,7 @@
     <div class="left-panel">
       <div class="global-counter">
         <p class="gl-label">人 類 の<br>探 究</p>
+        <div class="gl-divider"></div>
         <p class="gl-num" id="global-count">…</p>
         <p class="gl-unit">回</p>
       </div>
@@ -528,6 +560,7 @@
         <img class="profile-icon"
              src="https://github.com/otani-png.png"
              alt="otanibigvalley のアイコン">
+        <p class="profile-name">otanibigvalley</p>
         <div class="side-social">
           <a href="https://note.com/otanibigvalley" target="_blank" rel="noopener">note</a>
           <a href="https://x.com/Otanibigvalley"    target="_blank" rel="noopener">X</a>
