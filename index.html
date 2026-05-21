@@ -186,6 +186,24 @@
       font-family: Georgia, serif;
     }
 
+    /* ── 切り替え時の靄オーバーレイ ── */
+    .quote-box::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(250, 248, 243, 0.88);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 2;
+      transition: opacity 0.5s ease;   /* 晴れる：ゆっくり */
+    }
+    .card.transitioning .quote-box::after {
+      opacity: 1;
+      transition: opacity 0.12s ease;  /* かかる：素早く */
+    }
+
     .quote {
       font-size: 1.22rem;
       line-height: 2.1;
@@ -811,7 +829,8 @@
   });
 
   function generate() {
-    card.classList.add('active'); // 引用ボックスを展開（初回のみ実質的に動く）
+    card.classList.add('active');         // 引用ボックスを展開（初回のみ実質的に動く）
+    card.classList.add('transitioning'); // 靄をかける（0.12s で不透明に）
 
     const w1 = document.getElementById('w1');
     const w2 = document.getElementById('w2');
@@ -878,6 +897,9 @@
         q.classList.add('show');
         at.classList.add('show');
         gl.classList.add('show');
+
+        // 靄を晴らす（0.5s かけてゆっくり → 引用文が靄の中から浮かび上がる）
+        card.classList.remove('transitioning');
 
         // 個人カウント（localStorage に永続保存）
         myCount++;
