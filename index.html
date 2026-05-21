@@ -192,10 +192,14 @@
       letter-spacing: 0.06em;
       color: #2d2416;
       opacity: 0;
-      transition: opacity 0.55s ease 0.42s;
+      transition: opacity 0.15s ease;      /* フェードアウト：素早く */
     }
 
-    .quote.show { opacity: 1; }
+    /* フェードイン：バッジの後から遅延して出現 */
+    .quote.show {
+      opacity: 1;
+      transition: opacity 0.5s ease 0.28s;
+    }
 
     .quote .hl-love { color: #9a4060; font-style: italic; }
     .quote .hl-phil { color: #405080; }
@@ -206,7 +210,7 @@
       font-size: 0.85rem;
       letter-spacing: 0.18em;
       font-style: italic;
-      opacity: 1 !important;
+      /* opacity は .show クラスで管理 */
     }
 
     .attribution {
@@ -219,9 +223,12 @@
       overflow: hidden;
       font-style: italic;
       opacity: 0;
-      transition: opacity 0.4s ease 0.7s;
+      transition: opacity 0.15s ease;     /* フェードアウト */
     }
-    .attribution.show { opacity: 1; }
+    .attribution.show {
+      opacity: 1;
+      transition: opacity 0.4s ease 0.45s; /* フェードイン */
+    }
 
     /* ──── ボタン ──── */
     .btn {
@@ -363,9 +370,12 @@
       border-top: 1px solid #e8e0d0;
       padding-top: 18px;
       opacity: 0;
-      transition: opacity 0.5s ease 0.9s;
+      transition: opacity 0.15s ease;      /* フェードアウト */
     }
-    .glossary.show { opacity: 1; }
+    .glossary.show {
+      opacity: 1;
+      transition: opacity 0.5s ease 0.8s;  /* フェードイン */
+    }
 
     .glossary-title {
       font-size: 0.6rem;
@@ -557,7 +567,7 @@
       </div>
 
       <div class="quote-box">
-        <p class="quote placeholder" id="quote">― 深淵を覗く ―</p>
+        <p class="quote placeholder show" id="quote">― 深淵を覗く ―</p>
       </div>
 
       <p class="attribution" id="attr"></p>
@@ -812,25 +822,27 @@
     const at = document.getElementById('attr');
     const gl = document.getElementById('glossary');
 
-    [w1, w2, w3, s1, s2].forEach(el => el.classList.remove('show'));
-    q.classList.remove('show', 'placeholder');
+    // ── Step 1: まず全要素をフェードアウト（コンテンツはまだ変えない）──
+    // .show を外すだけ → CSSの「フェードアウト用 transition: 0.15s」が走る
+    q.classList.remove('show');
     at.classList.remove('show');
+    [w1, w2, w3, s1, s2].forEach(el => el.classList.remove('show'));
     gl.classList.remove('show');
 
+    // ── 単語選択は即座に済ませておく ──
     const lw = pick(love);
     const pw = pick(phil);
-    // pw の語がew の文字列に含まれると文中で同じ語が2回出て冗長になるため再抽選
+    // pw の語が ew の文字列に含まれると文中で同じ語が2回出て冗長になるため再抽選
     let ew = pick(ending);
     let retry = 0;
     while (ew.includes(pw) && retry++ < 10) ew = pick(ending);
     const sentence = pick(templates)(lw, pw, ew);
-    const credit = pick(authors);
+    const credit   = pick(authors);
 
+    // ── Step 2: フェードアウト完了（0.15s + バッファ）後にコンテンツ差し替え ──
     setTimeout(() => {
-      w1.textContent = lw;
-      w2.textContent = pw;
-      w3.textContent = ew;
-      [w1, s1, w2, s2, w3].forEach(el => el.classList.add('show'));
+      // ここは完全に不可視状態なので、スタイルが変わっても見えない
+      q.classList.remove('placeholder');
 
       function wrapOnce(html, word, cls) {
         const idx = html.indexOf(word);
@@ -846,11 +858,11 @@
       html = wrapOnce(html, pw, 'hl-phil');
       html = wrapOnce(html, ew, 'hl-end');
 
-      q.innerHTML = html;
-      q.classList.add('show');
-
+      q.innerHTML    = html;
       at.textContent = credit;
-      at.classList.add('show');
+      w1.textContent = lw;
+      w2.textContent = pw;
+      w3.textContent = ew;
 
       document.getElementById('gl-love-term').textContent = lw;
       document.getElementById('gl-love-desc').textContent = loveDesc[lw] ?? '';
@@ -858,16 +870,24 @@
       document.getElementById('gl-phil-desc').textContent = philDesc[pw] ?? '';
       document.getElementById('gl-end-term').textContent  = ew;
       document.getElementById('gl-end-desc').textContent  = endDesc[ew] ?? '';
-      gl.classList.add('show');
 
-      // 個人カウント（localStorage に永続保存）
-      myCount++;
-      localStorage.setItem(COUNT_KEY, myCount);
-      document.getElementById('my-count').textContent = myCount;
+      // ── Step 3: ブラウザが描画を確定させた直後にフェードイン ──
+      // rAF を2段重ねにすることで「描画→スタイル適用」の順を保証
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        [w1, s1, w2, s2, w3].forEach(el => el.classList.add('show'));
+        q.classList.add('show');
+        at.classList.add('show');
+        gl.classList.add('show');
 
-      // 全体カウント（外部API）
-      incrementGlobal();
-    }, 80);
+        // 個人カウント（localStorage に永続保存）
+        myCount++;
+        localStorage.setItem(COUNT_KEY, myCount);
+        document.getElementById('my-count').textContent = myCount;
+
+        // 全体カウント（外部API）
+        incrementGlobal();
+      }));
+    }, 200); // 0.15s のフェードアウトが完了するのを待つ
   }
 </script>
 
