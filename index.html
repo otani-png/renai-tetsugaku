@@ -233,22 +233,28 @@
 
     /* ── 砂散らしアニメーション（初回のみ） ── */
     @keyframes sandScatter {
-      0%   {
-        opacity: 1;
-        transform: translate(0, 0) rotate(0deg) scale(1);
-        filter: blur(0px);
-      }
-      100% {
-        opacity: 0;
-        transform: translate(var(--dx, 30px), var(--dy, 10px)) rotate(var(--dr, 15deg)) scale(0.25);
-        filter: blur(0.8px);
-      }
+      0%   { opacity: 1; transform: translate(0,0) rotate(0deg) scale(1);    filter: blur(0px);   }
+      30%  { opacity: 0.7; }
+      100% { opacity: 0; transform: translate(var(--dx),var(--dy)) rotate(var(--dr)) scale(0); filter: blur(2px); }
+    }
+
+    /* 砂粒パーティクル */
+    @keyframes grainFloat {
+      0%   { opacity: 0.9; transform: translate(0,0);              filter: blur(0px);   }
+      100% { opacity: 0;   transform: translate(var(--dx),var(--dy)); filter: blur(1px); }
     }
 
     .quote .char { display: inline-block; }
 
     .quote .char.scatter {
-      animation: sandScatter 0.4s ease-in forwards;
+      animation: sandScatter 0.38s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+    }
+
+    .sand-grain {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: grainFloat var(--dur, 0.3s) ease-in var(--dly, 0s) forwards;
     }
 
     .attribution {
@@ -924,20 +930,20 @@
 
     if (isFirst) {
       // ── 初回：「深淵を覗く」の文字を砂のように飛ばす ──
-      const text = q.textContent; // "― 深淵を覗く ―"
+      const text = q.textContent;
 
       // 1文字ずつ <span class="char"> に分解
       q.innerHTML = [...text].map(ch =>
         `<span class="char">${ch === ' ' ? '&nbsp;' : ch}</span>`
       ).join('');
 
-      // 各文字にランダムな飛散方向と遅延をセット
+      // 各文字にランダムな飛散方向と遅延をセット（より強く・速く）
       q.querySelectorAll('.char').forEach((span, i) => {
-        const sign = Math.random() < 0.3 ? -1 : 1;    // 70%が右・30%が左へ
-        const dx   = sign * (12 + Math.random() * 58); // 水平距離
-        const dy   = -28 + Math.random() * 58;          // 上下（砂は上にも下にも）
-        const dr   = -50 + Math.random() * 100;         // 回転角
-        const dly  = i * 0.028 + Math.random() * 0.02; // 左→右へ段階的に飛ぶ
+        const sign = Math.random() < 0.35 ? -1 : 1;     // 65%が右・35%が左
+        const dx   = sign * (35 + Math.random() * 85);  // ±35〜120px
+        const dy   = -55 + Math.random() * 85;           // -55〜+30px
+        const dr   = -90 + Math.random() * 180;          // ±90deg
+        const dly  = i * 0.022 + Math.random() * 0.022; // 左→右スタガー
         span.style.setProperty('--dx', `${dx}px`);
         span.style.setProperty('--dy', `${dy}px`);
         span.style.setProperty('--dr', `${dr}deg`);
@@ -945,9 +951,39 @@
         span.classList.add('scatter');
       });
 
-      // 散らし完了を待ってコンテンツ差し替え
-      // （500ms 以降は親の opacity:0 で残ったアニメも不可視になるので安全）
-      setTimeout(swapAndReveal, 500);
+      // ── 砂粒パーティクルを生成 ──
+      const quoteBox = q.parentElement; // .quote-box (overflow:hidden で端でクリップ)
+      const grainColors = [
+        '#c4b89a','#d4c8b0','#b8a880','#c4a55a',
+        '#e0d4bc','#a89060','#d8ccb4','#c8b890',
+      ];
+      const grains = [];
+      for (let i = 0; i < 35; i++) {
+        const g      = document.createElement('span');
+        g.className  = 'sand-grain';
+        const size   = 1.5 + Math.random() * 3.5;               // 1.5〜5px
+        const color  = grainColors[i % grainColors.length];
+        const dx     = (-120 + Math.random() * 240);             // ±120px
+        const dy     = (-75  + Math.random() * 110);             // -75〜+35px
+        const dur    = 0.20  + Math.random() * 0.30;             // 0.2〜0.5s
+        const dly    = Math.random() * 0.20;                     // 0〜0.2s
+        g.style.cssText = [
+          `width:${size}px`,   `height:${size}px`,
+          `left:${6 + Math.random() * 88}%`,
+          `top:${6 + Math.random() * 55}px`,
+          `background:${color}`,
+          `--dx:${dx}px`, `--dy:${dy}px`,
+          `--dur:${dur}s`, `--dly:${dly}s`,
+        ].join(';');
+        quoteBox.appendChild(g);
+        grains.push(g);
+      }
+
+      // 砂粒クリーンアップ（swapAndReveal の後も少し残して引用出現と重ねる）
+      setTimeout(() => grains.forEach(g => g.remove()), 700);
+
+      // 散らし完了後にコンテンツ差し替え
+      setTimeout(swapAndReveal, 480);
 
     } else {
       // ── 2回目以降：靄フロー ──
