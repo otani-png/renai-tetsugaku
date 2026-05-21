@@ -231,6 +231,26 @@
       /* opacity は .show クラスで管理 */
     }
 
+    /* ── 砂散らしアニメーション（初回のみ） ── */
+    @keyframes sandScatter {
+      0%   {
+        opacity: 1;
+        transform: translate(0, 0) rotate(0deg) scale(1);
+        filter: blur(0px);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--dx, 30px), var(--dy, 10px)) rotate(var(--dr, 15deg)) scale(0.25);
+        filter: blur(0.8px);
+      }
+    }
+
+    .quote .char { display: inline-block; }
+
+    .quote .char.scatter {
+      animation: sandScatter 0.4s ease-in forwards;
+    }
+
     .attribution {
       text-align: right;
       font-size: 0.73rem;
@@ -829,8 +849,7 @@
   });
 
   function generate() {
-    card.classList.add('active');         // 引用ボックスを展開（初回のみ実質的に動く）
-    card.classList.add('transitioning'); // 靄をかける（0.12s で不透明に）
+    card.classList.add('active'); // 引用ボックスを展開（初回のみ実質的に動く）
 
     const w1 = document.getElementById('w1');
     const w2 = document.getElementById('w2');
@@ -841,27 +860,23 @@
     const at = document.getElementById('attr');
     const gl = document.getElementById('glossary');
 
-    // ── Step 1: まず全要素をフェードアウト（コンテンツはまだ変えない）──
-    // .show を外すだけ → CSSの「フェードアウト用 transition: 0.15s」が走る
-    q.classList.remove('show');
-    at.classList.remove('show');
-    [w1, w2, w3, s1, s2].forEach(el => el.classList.remove('show'));
-    gl.classList.remove('show');
-
-    // ── 単語選択は即座に済ませておく ──
+    // ── 単語選択（早めに済ませておく） ──
     const lw = pick(love);
     const pw = pick(phil);
-    // pw の語が ew の文字列に含まれると文中で同じ語が2回出て冗長になるため再抽選
     let ew = pick(ending);
     let retry = 0;
     while (ew.includes(pw) && retry++ < 10) ew = pick(ending);
     const sentence = pick(templates)(lw, pw, ew);
     const credit   = pick(authors);
 
-    // ── Step 2: フェードアウト完了（0.15s + バッファ）後にコンテンツ差し替え ──
-    setTimeout(() => {
-      // ここは完全に不可視状態なので、スタイルが変わっても見えない
-      q.classList.remove('placeholder');
+    const isFirst = q.classList.contains('placeholder');
+
+    // ── 共通：コンテンツ差し替え → フェードイン ──
+    // transition を瞬間バイパスして確実に opacity:0 を確定し、差し替え後にフェードイン
+    function swapAndReveal() {
+      q.style.transition = 'none';              // transition を一時無効化
+      q.classList.remove('show', 'placeholder'); // 即座に opacity:0
+      void q.offsetWidth;                        // reflow で確定
 
       function wrapOnce(html, word, cls) {
         const idx = html.indexOf(word);
@@ -890,26 +905,61 @@
       document.getElementById('gl-end-term').textContent  = ew;
       document.getElementById('gl-end-desc').textContent  = endDesc[ew] ?? '';
 
-      // ── Step 3: ブラウザが描画を確定させた直後にフェードイン ──
-      // rAF を2段重ねにすることで「描画→スタイル適用」の順を保証
+      q.style.transition = '';                  // CSS の transition を復元
+
+      // rAF 2段重ねで「描画確定後」にフェードイン
       requestAnimationFrame(() => requestAnimationFrame(() => {
         [w1, s1, w2, s2, w3].forEach(el => el.classList.add('show'));
         q.classList.add('show');
         at.classList.add('show');
         gl.classList.add('show');
+        card.classList.remove('transitioning'); // 靄を晴らす（2回目以降）
 
-        // 靄を晴らす（0.5s かけてゆっくり → 引用文が靄の中から浮かび上がる）
-        card.classList.remove('transitioning');
-
-        // 個人カウント（localStorage に永続保存）
         myCount++;
         localStorage.setItem(COUNT_KEY, myCount);
         document.getElementById('my-count').textContent = myCount;
-
-        // 全体カウント（外部API）
         incrementGlobal();
       }));
-    }, 200); // 0.15s のフェードアウトが完了するのを待つ
+    }
+
+    if (isFirst) {
+      // ── 初回：「深淵を覗く」の文字を砂のように飛ばす ──
+      const text = q.textContent; // "― 深淵を覗く ―"
+
+      // 1文字ずつ <span class="char"> に分解
+      q.innerHTML = [...text].map(ch =>
+        `<span class="char">${ch === ' ' ? '&nbsp;' : ch}</span>`
+      ).join('');
+
+      // 各文字にランダムな飛散方向と遅延をセット
+      q.querySelectorAll('.char').forEach((span, i) => {
+        const sign = Math.random() < 0.3 ? -1 : 1;    // 70%が右・30%が左へ
+        const dx   = sign * (12 + Math.random() * 58); // 水平距離
+        const dy   = -28 + Math.random() * 58;          // 上下（砂は上にも下にも）
+        const dr   = -50 + Math.random() * 100;         // 回転角
+        const dly  = i * 0.028 + Math.random() * 0.02; // 左→右へ段階的に飛ぶ
+        span.style.setProperty('--dx', `${dx}px`);
+        span.style.setProperty('--dy', `${dy}px`);
+        span.style.setProperty('--dr', `${dr}deg`);
+        span.style.animationDelay = `${dly}s`;
+        span.classList.add('scatter');
+      });
+
+      // 散らし完了を待ってコンテンツ差し替え
+      // （500ms 以降は親の opacity:0 で残ったアニメも不可視になるので安全）
+      setTimeout(swapAndReveal, 500);
+
+    } else {
+      // ── 2回目以降：靄フロー ──
+      card.classList.add('transitioning'); // 靄をかける（0.12s で不透明に）
+
+      q.classList.remove('show');
+      at.classList.remove('show');
+      [w1, w2, w3, s1, s2].forEach(el => el.classList.remove('show'));
+      gl.classList.remove('show');
+
+      setTimeout(swapAndReveal, 200);
+    }
   }
 </script>
 
