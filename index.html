@@ -260,15 +260,22 @@
       color: #faf8f3;
     }
 
+    /* ──── カウンター ──── */
     .counter {
-      text-align: center;
-      margin-top: 14px;
-      color: #d4c8b0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      margin-top: 16px;
       font-size: 0.7rem;
-      letter-spacing: 0.2em;
+      letter-spacing: 0.12em;
+      color: #c4b89a;
     }
 
-    .counter span { color: #a89878; }
+    .counter-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .counter-label { font-size: 0.6rem; letter-spacing: 0.2em; color: #d4c8b0; }
+    .counter-num   { font-size: 1rem; color: #a89060; letter-spacing: 0.05em; }
+    .counter-sep   { color: #e0d8c8; font-size: 1rem; }
 
     /* ──── 用語解説 ──── */
     .glossary {
@@ -314,6 +321,43 @@
       color: #c4a55a55;
       font-size: 0.7rem;
       letter-spacing: 0.5em;
+    }
+
+    /* ──── SNS リンク ──── */
+    .social-footer {
+      margin-top: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+    }
+
+    .social-footer a {
+      color: #a89060;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s, color 0.2s;
+      padding-bottom: 1px;
+    }
+
+    .social-footer a:hover { color: #c4a55a; border-color: #c4a55a; }
+    .social-footer .pipe    { color: #d4c8b0; }
+
+    /* ──── 広告枠 ──── */
+    .ad-slot {
+      max-width: 680px;
+      width: 100%;
+      margin-top: 24px;
+      min-height: 90px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed #d4c8b0;
+      color: #d4c8b0;
+      font-size: 0.65rem;
+      letter-spacing: 0.15em;
     }
   </style>
 </head>
@@ -363,7 +407,18 @@
     <p class="attribution" id="attr"></p>
 
     <button class="btn" onclick="generate()">▷ &nbsp; 哲学する</button>
-    <p class="counter">生成回数：<span id="count">0</span></p>
+
+    <div class="counter">
+      <div class="counter-item">
+        <span class="counter-label">あなた</span>
+        <span class="counter-num" id="my-count">0</span>
+      </div>
+      <span class="counter-sep">｜</span>
+      <div class="counter-item">
+        <span class="counter-label">みんな</span>
+        <span class="counter-num" id="global-count">…</span>
+      </div>
+    </div>
 
     <div class="glossary" id="glossary">
       <p class="glossary-title">用語解説</p>
@@ -383,6 +438,17 @@
   </div>
 
   <p class="footer-deco">✦ &nbsp; ✦ &nbsp; ✦</p>
+
+  <div class="social-footer">
+    <a href="https://note.com/otanibigvalley" target="_blank" rel="noopener">note</a>
+    <span class="pipe">｜</span>
+    <a href="https://x.com/Otanibigvalley" target="_blank" rel="noopener">X (Twitter)</a>
+  </div>
+
+  <!-- Google AdSense 広告枠 ─ AdSense 審査通過後にこの div を差し替えてください -->
+  <div class="ad-slot" id="ad-slot">
+    広告枠（AdSense 設定後に有効化）
+  </div>
 
 <script>
   /* ── 単語リスト（十代後半〜二十代前半女性向け） ── */
@@ -535,7 +601,36 @@
     'という名の哲学的問いである':     'それは単なる感情ではなく、根本的な問いかけそのものだということ。',
   };
 
-  let count = 0;
+  /* ──── カウンター ──── */
+  const COUNT_KEY   = 'renai-tetsugaku-mycount';
+  const COUNTER_API = 'https://api.countapi.xyz/hit/otanipng-renai-tetsugaku/generate';
+  const COUNTER_GET = 'https://api.countapi.xyz/get/otanipng-renai-tetsugaku/generate';
+
+  let myCount = parseInt(localStorage.getItem(COUNT_KEY) || '0');
+  document.getElementById('my-count').textContent = myCount;
+
+  // ページ読み込み時にグローバルカウントを取得（加算なし）
+  (async () => {
+    try {
+      const r = await fetch(COUNTER_GET, { signal: AbortSignal.timeout(4000) });
+      const d = await r.json();
+      document.getElementById('global-count').textContent =
+        (d.value || 0).toLocaleString('ja-JP');
+    } catch {
+      document.getElementById('global-count').textContent = '---';
+    }
+  })();
+
+  async function incrementGlobal() {
+    try {
+      const r = await fetch(COUNTER_API, { signal: AbortSignal.timeout(4000) });
+      const d = await r.json();
+      document.getElementById('global-count').textContent =
+        (d.value || 0).toLocaleString('ja-JP');
+    } catch {
+      document.getElementById('global-count').textContent = '---';
+    }
+  }
 
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
@@ -597,8 +692,13 @@
       document.getElementById('gl-end-desc').textContent  = endDesc[ew] ?? '';
       gl.classList.add('show');
 
-      count++;
-      document.getElementById('count').textContent = count;
+      // 個人カウント（localStorage に永続保存）
+      myCount++;
+      localStorage.setItem(COUNT_KEY, myCount);
+      document.getElementById('my-count').textContent = myCount;
+
+      // 全体カウント（外部API）
+      incrementGlobal();
     }, 80);
   }
 </script>
