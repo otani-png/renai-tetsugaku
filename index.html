@@ -260,22 +260,99 @@
       color: #faf8f3;
     }
 
-    /* ──── カウンター ──── */
-    .counter {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      margin-top: 16px;
-      font-size: 0.7rem;
-      letter-spacing: 0.12em;
+    /* ──── 3カラム グリッド ──── */
+    .page-layout {
+      display: grid;
+      grid-template-columns: 148px minmax(0, 680px) 148px;
+      gap: 0 28px;
+      max-width: 1040px;
+      width: 100%;
+      align-items: start;
+    }
+
+    /* ──── サイドパネル 共通 ──── */
+    .left-panel,
+    .right-panel {
+      position: sticky;
+      top: 32px;
+    }
+
+    /* ──── 左パネル：人類の探究 ──── */
+    .global-counter {
+      text-align: center;
+      padding-top: 48px;
+    }
+
+    .gl-label {
+      font-size: 0.62rem;
+      letter-spacing: 0.28em;
+      color: #c4b89a;
+      margin-bottom: 16px;
+      line-height: 1.8;
+    }
+
+    .gl-num {
+      font-size: 2.4rem;
+      color: #8a7040;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .gl-unit {
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
       color: #c4b89a;
     }
 
-    .counter-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-    .counter-label { font-size: 0.6rem; letter-spacing: 0.2em; color: #d4c8b0; }
-    .counter-num   { font-size: 1rem; color: #a89060; letter-spacing: 0.05em; }
-    .counter-sep   { color: #e0d8c8; font-size: 1rem; }
+    /* ──── 右パネル：プロフィール・SNS ──── */
+    .profile-block {
+      text-align: center;
+      padding-top: 48px;
+    }
+
+    .profile-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid #d4c8b0;
+      display: block;
+      margin: 0 auto 14px;
+      opacity: 0.85;
+      filter: sepia(0.15);
+      transition: opacity 0.2s;
+    }
+
+    .profile-icon:hover { opacity: 1; }
+
+    .side-social {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .side-social a {
+      display: block;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: #a89060;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: color 0.2s, border-color 0.2s;
+      padding-bottom: 1px;
+    }
+
+    .side-social a:hover { color: #c4a55a; border-color: #c4a55a; }
+
+    /* ──── カード内：汝の思索カウンター ──── */
+    .counter {
+      text-align: center;
+      margin-top: 14px;
+      line-height: 1;
+    }
+
+    .counter-label { font-size: 0.6rem; letter-spacing: 0.25em; color: #d4c8b0; display: block; margin-bottom: 4px; }
+    .counter-num   { font-size: 0.95rem; color: #a89060; letter-spacing: 0.08em; }
 
     /* ──── 用語解説 ──── */
     .glossary {
@@ -317,33 +394,11 @@
 
     /* ──── フッター装飾 ──── */
     .footer-deco {
-      margin-top: 28px;
+      margin-top: 32px;
       color: #c4a55a55;
       font-size: 0.7rem;
       letter-spacing: 0.5em;
     }
-
-    /* ──── SNS リンク ──── */
-    .social-footer {
-      margin-top: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 16px;
-      font-size: 0.72rem;
-      letter-spacing: 0.18em;
-    }
-
-    .social-footer a {
-      color: #a89060;
-      text-decoration: none;
-      border-bottom: 1px solid transparent;
-      transition: border-color 0.2s, color 0.2s;
-      padding-bottom: 1px;
-    }
-
-    .social-footer a:hover { color: #c4a55a; border-color: #c4a55a; }
-    .social-footer .pipe    { color: #d4c8b0; }
 
     /* ──── 広告枠 ──── */
     .ad-slot {
@@ -358,6 +413,31 @@
       color: #d4c8b0;
       font-size: 0.65rem;
       letter-spacing: 0.15em;
+    }
+
+    /* ──── レスポンシブ ──── */
+    @media (max-width: 880px) {
+      .page-layout {
+        grid-template-columns: 1fr;
+      }
+      .left-panel, .right-panel {
+        position: static;
+        display: flex;
+        justify-content: center;
+        padding-top: 0;
+      }
+      .global-counter, .profile-block {
+        padding-top: 24px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+      .gl-label { margin-bottom: 0; writing-mode: horizontal-tb; }
+      .side-social { flex-direction: row; }
+      .profile-icon { margin: 0; }
+      .left-panel  { order: 2; }
+      .card        { order: 1; }
+      .right-panel { order: 3; }
     }
   </style>
 </head>
@@ -391,59 +471,73 @@
     <p class="subtitle">まじめすぎる恋愛論</p>
   </div>
 
-  <div class="card">
-    <div class="words-row">
-      <span class="badge badge-love" id="w1">恋愛語</span>
-      <span class="sep" id="s1">×</span>
-      <span class="badge badge-phil" id="w2">哲学概念</span>
-      <span class="sep" id="s2">×</span>
-      <span class="badge badge-end"  id="w3">哲学的結論</span>
+  <div class="page-layout">
+
+    <!-- 左パネル：人類の探究カウンター -->
+    <div class="left-panel">
+      <div class="global-counter">
+        <p class="gl-label">人 類 の<br>探 究</p>
+        <p class="gl-num" id="global-count">…</p>
+        <p class="gl-unit">回</p>
+      </div>
     </div>
 
-    <div class="quote-box">
-      <p class="quote placeholder" id="quote">― ボタンを押すと、深淵が口を開く ―</p>
-    </div>
+    <!-- メインカード -->
+    <div class="card">
+      <div class="words-row">
+        <span class="badge badge-love" id="w1">恋愛語</span>
+        <span class="sep" id="s1">×</span>
+        <span class="badge badge-phil" id="w2">哲学概念</span>
+        <span class="sep" id="s2">×</span>
+        <span class="badge badge-end"  id="w3">哲学的結論</span>
+      </div>
 
-    <p class="attribution" id="attr"></p>
+      <div class="quote-box">
+        <p class="quote placeholder" id="quote">― ボタンを押すと、深淵が口を開く ―</p>
+      </div>
 
-    <button class="btn" onclick="generate()">▷ &nbsp; 哲学する</button>
+      <p class="attribution" id="attr"></p>
 
-    <div class="counter">
-      <div class="counter-item">
-        <span class="counter-label">あなた</span>
+      <button class="btn" onclick="generate()">▷ &nbsp; 哲学する</button>
+
+      <div class="counter">
+        <span class="counter-label">汝 の 思 索</span>
         <span class="counter-num" id="my-count">0</span>
       </div>
-      <span class="counter-sep">｜</span>
-      <div class="counter-item">
-        <span class="counter-label">みんな</span>
-        <span class="counter-num" id="global-count">…</span>
+
+      <div class="glossary" id="glossary">
+        <p class="glossary-title">用語解説</p>
+        <div class="glossary-item love">
+          <span class="glossary-term" id="gl-love-term"></span>
+          <span class="glossary-desc"  id="gl-love-desc"></span>
+        </div>
+        <div class="glossary-item phil">
+          <span class="glossary-term" id="gl-phil-term"></span>
+          <span class="glossary-desc"  id="gl-phil-desc"></span>
+        </div>
+        <div class="glossary-item end">
+          <span class="glossary-term" id="gl-end-term"></span>
+          <span class="glossary-desc"  id="gl-end-desc"></span>
+        </div>
       </div>
     </div>
 
-    <div class="glossary" id="glossary">
-      <p class="glossary-title">用語解説</p>
-      <div class="glossary-item love">
-        <span class="glossary-term" id="gl-love-term"></span>
-        <span class="glossary-desc"  id="gl-love-desc"></span>
-      </div>
-      <div class="glossary-item phil">
-        <span class="glossary-term" id="gl-phil-term"></span>
-        <span class="glossary-desc"  id="gl-phil-desc"></span>
-      </div>
-      <div class="glossary-item end">
-        <span class="glossary-term" id="gl-end-term"></span>
-        <span class="glossary-desc"  id="gl-end-desc"></span>
+    <!-- 右パネル：プロフィール・SNS -->
+    <div class="right-panel">
+      <div class="profile-block">
+        <img class="profile-icon"
+             src="https://github.com/otani-png.png"
+             alt="otanibigvalley のアイコン">
+        <div class="side-social">
+          <a href="https://note.com/otanibigvalley" target="_blank" rel="noopener">note</a>
+          <a href="https://x.com/Otanibigvalley"    target="_blank" rel="noopener">X</a>
+        </div>
       </div>
     </div>
-  </div>
+
+  </div><!-- /.page-layout -->
 
   <p class="footer-deco">✦ &nbsp; ✦ &nbsp; ✦</p>
-
-  <div class="social-footer">
-    <a href="https://note.com/otanibigvalley" target="_blank" rel="noopener">note</a>
-    <span class="pipe">｜</span>
-    <a href="https://x.com/Otanibigvalley" target="_blank" rel="noopener">X (Twitter)</a>
-  </div>
 
   <!-- Google AdSense 広告枠 ─ AdSense 審査通過後にこの div を差し替えてください -->
   <div class="ad-slot" id="ad-slot">
