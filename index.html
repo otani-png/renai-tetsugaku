@@ -35,105 +35,70 @@
     .colonnade {
       display: flex;
       justify-content: space-between;
+      align-items: flex-end;
       max-width: 1040px;
       width: 100%;
-      padding: 0 2px;
+      padding: 0;
       margin-bottom: 0;
     }
 
     .col {
-      width: 14px;
-      height: 56px;
-      background: linear-gradient(to right, #d4bc8a, #c4a55a 40%, #d4bc8a);
-      border-radius: 2px 2px 0 0;
-    }
-
-    .col::before {
-      content: '';
-      display: block;
-      width: 100%;
-      height: 6px;
+      width: 11px;
+      height: 52px;
       background: #c4a55a;
-      border-radius: 2px 2px 0 0;
-      transform: translateY(-6px) scaleX(1.3);
-      transform-origin: center bottom;
+      border-radius: 1px 1px 0 0;
+      flex-shrink: 0;
     }
 
+    /* アーキトレーブ（水平梁）─ ソリッドでシャープに */
     .architrave {
       width: 100%;
       max-width: 1040px;
-      height: 6px;
-      background: linear-gradient(to right, transparent 0%, #c4a55a 4%, #c4a55a 96%, transparent 100%);
-      margin-bottom: 0;
+      height: 5px;
+      background: #c4a55a;
     }
 
+    /* フリーズ（装飾帯）─ 薄いストライプ1本 */
     .frieze {
       width: 100%;
       max-width: 1040px;
-      height: 18px;
-      background: linear-gradient(to right, transparent 0%, #d4bc8a22 4%, #d4bc8a22 96%, transparent 100%);
-      border-bottom: 1px solid #c4a55a44;
-      margin-bottom: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .frieze-dots {
-      display: flex;
-      gap: 20px;
-    }
-
-    .frieze-dot {
-      width: 3px;
-      height: 3px;
-      background: #c4a55a88;
-      border-radius: 50%;
+      height: 10px;
+      background: rgba(196,165,90,0.12);
+      border-bottom: 1px solid rgba(196,165,90,0.35);
+      margin-bottom: 0;
     }
 
     /* ──── ヘッダー ──── */
     .header {
-      text-align: center;
-      margin-bottom: 36px;
-    }
-
-    .deco-line {
+      width: 100%;
+      max-width: 1040px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      color: #c4a55a;
-      font-size: 0.75rem;
-      letter-spacing: 0.2em;
-      margin-bottom: 14px;
+      padding: 32px 0 28px;
+      border-bottom: 1px solid rgba(196,165,90,0.25);
+      margin-bottom: 36px;
+      gap: 0;
     }
 
-    .deco-line::before,
-    .deco-line::after {
-      content: '';
-      display: block;
-      width: 60px;
-      height: 1px;
-      background: linear-gradient(to right, transparent, #c4a55a);
-    }
-
-    .deco-line::after {
-      background: linear-gradient(to left, transparent, #c4a55a);
+    .header-inner {
+      text-align: center;
     }
 
     h1 {
-      font-size: 1.7rem;
+      font-size: 1.65rem;
       font-weight: normal;
-      letter-spacing: 0.4em;
+      letter-spacing: 0.45em;
       color: #2d2416;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
+      text-indent: 0.45em; /* letter-spacing 分の視覚補正 */
     }
 
     .subtitle {
-      font-size: 0.78rem;
-      color: #9a8a72;
-      letter-spacing: 0.3em;
-      font-style: italic;
+      font-size: 0.72rem;
+      color: #a89878;
+      letter-spacing: 0.35em;
+      text-indent: 0.35em;
     }
 
     /* ──── カード（石板イメージ） ──── */
@@ -186,13 +151,19 @@
     .quote-box {
       position: relative;
       border-left: 2px solid #c4a55a;
-      padding: 20px 24px;
+      padding: 16px 24px;
       margin-bottom: 12px;
-      height: 178px;          /* 固定高さ — ボタン位置を安定させる */
+      height: 68px;                      /* 初期：コンパクト */
       overflow: hidden;
       display: flex;
       align-items: center;
       background: linear-gradient(to right, rgba(196,165,90,0.05), transparent);
+      transition: height 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* 初回生成後に展開 */
+    .card.active .quote-box {
+      height: 178px;
     }
 
     .quote-box::before {
@@ -487,19 +458,13 @@
     <div class="col"></div>
   </div>
   <div class="architrave"></div>
-  <div class="frieze">
-    <div class="frieze-dots">
-      <div class="frieze-dot"></div><div class="frieze-dot"></div>
-      <div class="frieze-dot"></div><div class="frieze-dot"></div>
-      <div class="frieze-dot"></div><div class="frieze-dot"></div>
-      <div class="frieze-dot"></div>
-    </div>
-  </div>
+  <div class="frieze"></div>
 
   <div class="header">
-    <div class="deco-line">✦</div>
-    <h1>恋愛哲学ジェネレーター</h1>
-    <p class="subtitle">まじめすぎる恋愛論</p>
+    <div class="header-inner">
+      <h1>恋愛哲学ジェネレーター</h1>
+      <p class="subtitle">まじめすぎる恋愛論</p>
+    </div>
   </div>
 
   <div class="page-layout">
@@ -525,7 +490,7 @@
       </div>
 
       <div class="quote-box">
-        <p class="quote placeholder" id="quote">― ボタンを押すと、深淵が口を開く ―</p>
+        <p class="quote placeholder" id="quote">― 深淵を覗く ―</p>
       </div>
 
       <p class="attribution" id="attr"></p>
@@ -761,7 +726,11 @@
 
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
+  const card = document.querySelector('.card');
+
   function generate() {
+    card.classList.add('active'); // 引用ボックスを展開（初回のみ実質的に動く）
+
     const w1 = document.getElementById('w1');
     const w2 = document.getElementById('w2');
     const w3 = document.getElementById('w3');
