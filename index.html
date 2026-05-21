@@ -118,13 +118,21 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 10px;
+      gap: 8px;
       margin-bottom: 28px;
-      flex-wrap: wrap;
+      flex-wrap: nowrap;
+      height: 40px;
+      overflow: hidden;
     }
 
     .badge {
-      padding: 4px 14px;
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: center;
+      padding: 4px 10px;
       font-size: 0.8rem;
       letter-spacing: 0.12em;
       border: 1px solid;
@@ -140,6 +148,7 @@
     .badge-end  { border-color: #80a880; color: #405840; transition-delay: 0.24s; }
 
     .sep {
+      flex-shrink: 0;
       color: #d4c8b0;
       font-size: 0.85rem;
       opacity: 0;
@@ -407,6 +416,41 @@
       color: #d4c8b0;
       font-size: 0.65rem;
       letter-spacing: 0.15em;
+    }
+
+    /* ──── オープニングアニメーション ──── */
+    @keyframes colDrop {
+      from { transform: translateY(-24px); opacity: 0; }
+      to   { transform: translateY(0);     opacity: 1; }
+    }
+    @keyframes archExpand {
+      from { transform: scaleX(0); }
+      to   { transform: scaleX(1); }
+    }
+    @keyframes fadeUp {
+      from { transform: translateY(14px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .col {
+      animation: colDrop 0.4s ease-out backwards;
+    }
+    .architrave {
+      transform-origin: center;
+      animation: archExpand 0.4s ease-out 0.4s backwards;
+    }
+    .frieze {
+      animation: fadeUp 0.3s ease-out 0.55s backwards;
+    }
+    .header {
+      animation: fadeUp 0.5s ease-out 0.55s backwards;
+    }
+    .card {
+      animation: fadeUp 0.6s ease-out 0.7s backwards;
+    }
+    .left-panel > div,
+    .right-panel > div {
+      animation: fadeUp 0.5s ease-out 0.72s backwards;
     }
 
     /* ──── レスポンシブ ──── */
@@ -727,6 +771,11 @@
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
   const card = document.querySelector('.card');
+
+  // オープニングアニメーション：柱を左から右へ段階的に落とす
+  document.querySelectorAll('.col').forEach((col, i) => {
+    col.style.animationDelay = `${i * 0.04}s`;
+  });
 
   function generate() {
     card.classList.add('active'); // 引用ボックスを展開（初回のみ実質的に動く）
