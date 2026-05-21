@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>恋愛哲学ジェネレーター</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0 16px 64px;
+      font-family: 'Georgia', '游明朝', 'YuMincho', serif;
+      color: #2d2416;
+      background-color: #ede8df;
+      /* 大理石風の縦縞を薄く */
+      background-image:
+        repeating-linear-gradient(
+          100deg,
+          transparent 0px, transparent 70px,
+          rgba(170,145,110,0.06) 70px, rgba(170,145,110,0.06) 71px
+        ),
+        repeating-linear-gradient(
+          -8deg,
+          transparent 0px, transparent 90px,
+          rgba(150,130,100,0.04) 90px, rgba(150,130,100,0.04) 91px
+        );
+    }
+
+    /* ──── 柱廊（コロネード） ──── */
+    .colonnade {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      padding: 0 20px;
+      margin-bottom: 0;
+    }
+
+    .col {
+      width: 14px;
+      height: 56px;
+      background: linear-gradient(to right, #d4bc8a, #c4a55a 40%, #d4bc8a);
+      border-radius: 2px 2px 0 0;
+    }
+
+    .col::before {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 6px;
+      background: #c4a55a;
+      border-radius: 2px 2px 0 0;
+      transform: translateY(-6px) scaleX(1.3);
+      transform-origin: center bottom;
+    }
+
+    .architrave {
+      width: 100%;
+      max-width: 680px;
+      height: 6px;
+      background: linear-gradient(to right, transparent 0%, #c4a55a 8%, #c4a55a 92%, transparent 100%);
+      margin-bottom: 0;
+    }
+
+    .frieze {
+      width: 100%;
+      max-width: 680px;
+      height: 18px;
+      background: linear-gradient(to right, transparent 0%, #d4bc8a22 8%, #d4bc8a22 92%, transparent 100%);
+      border-bottom: 1px solid #c4a55a44;
+      margin-bottom: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .frieze-dots {
+      display: flex;
+      gap: 20px;
+    }
+
+    .frieze-dot {
+      width: 3px;
+      height: 3px;
+      background: #c4a55a88;
+      border-radius: 50%;
+    }
+
+    /* ──── ヘッダー ──── */
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .deco-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      color: #c4a55a;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      margin-bottom: 14px;
+    }
+
+    .deco-line::before,
+    .deco-line::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(to right, transparent, #c4a55a);
+    }
+
+    .deco-line::after {
+      background: linear-gradient(to left, transparent, #c4a55a);
+    }
+
+    h1 {
+      font-size: 1.7rem;
+      font-weight: normal;
+      letter-spacing: 0.4em;
+      color: #2d2416;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 0.78rem;
+      color: #9a8a72;
+      letter-spacing: 0.3em;
+      font-style: italic;
+    }
+
+    /* ──── カード（石板イメージ） ──── */
+    .card {
+      max-width: 680px;
+      width: 100%;
+      background: #faf8f3;
+      box-shadow:
+        0 1px 0 #c4a55a,
+        0 2px 6px rgba(80,60,30,0.1),
+        0 12px 40px rgba(80,60,30,0.12);
+      padding: 44px 40px 36px;
+    }
+
+    /* ──── バッジ ──── */
+    .words-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      padding: 4px 14px;
+      font-size: 0.8rem;
+      letter-spacing: 0.12em;
+      border: 1px solid;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .badge.show { opacity: 1; transform: translateY(0); }
+
+    .badge-love { border-color: #c4909a; color: #9a4060; transition-delay: 0s; }
+    .badge-phil { border-color: #8090b8; color: #405080; transition-delay: 0.12s; }
+    .badge-end  { border-color: #80a880; color: #405840; transition-delay: 0.24s; }
+
+    .sep {
+      color: #d4c8b0;
+      font-size: 0.85rem;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .sep.show { opacity: 1; }
+
+    /* ──── 引用 ──── */
+    .quote-box {
+      position: relative;
+      border-left: 2px solid #c4a55a;
+      padding: 20px 24px;
+      margin-bottom: 12px;
+      min-height: 96px;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(to right, rgba(196,165,90,0.05), transparent);
+    }
+
+    .quote-box::before {
+      content: '\201C';
+      position: absolute;
+      top: 4px;
+      left: -2px;
+      font-size: 3rem;
+      color: #c4a55a33;
+      line-height: 1;
+      font-family: Georgia, serif;
+    }
+
+    .quote {
+      font-size: 1.22rem;
+      line-height: 2.1;
+      letter-spacing: 0.06em;
+      color: #2d2416;
+      opacity: 0;
+      transition: opacity 0.55s ease 0.42s;
+    }
+
+    .quote.show { opacity: 1; }
+
+    .quote .hl-love { color: #9a4060; font-style: italic; }
+    .quote .hl-phil { color: #405080; }
+    .quote .hl-end  { color: #405840; }
+
+    .placeholder {
+      color: #c4b89a;
+      font-size: 0.85rem;
+      letter-spacing: 0.18em;
+      font-style: italic;
+      opacity: 1 !important;
+    }
+
+    .attribution {
+      text-align: right;
+      font-size: 0.73rem;
+      color: #c4b89a;
+      letter-spacing: 0.18em;
+      margin-bottom: 32px;
+      min-height: 1.2em;
+      font-style: italic;
+      opacity: 0;
+      transition: opacity 0.4s ease 0.7s;
+    }
+    .attribution.show { opacity: 1; }
+
+    /* ──── ボタン ──── */
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 15px;
+      border: 1px solid #c4a55a;
+      background: transparent;
+      color: #7a6030;
+      font-family: inherit;
+      font-size: 0.85rem;
+      letter-spacing: 0.35em;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn:hover {
+      background: #c4a55a;
+      color: #faf8f3;
+    }
+
+    .counter {
+      text-align: center;
+      margin-top: 14px;
+      color: #d4c8b0;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+    }
+
+    .counter span { color: #a89878; }
+
+    /* ──── 用語解説 ──── */
+    .glossary {
+      margin-top: 28px;
+      border-top: 1px solid #e8e0d0;
+      padding-top: 18px;
+      opacity: 0;
+      transition: opacity 0.5s ease 0.9s;
+    }
+    .glossary.show { opacity: 1; }
+
+    .glossary-title {
+      font-size: 0.6rem;
+      letter-spacing: 0.35em;
+      color: #c4b89a;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+
+    .glossary-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 7px;
+      font-size: 0.74rem;
+      line-height: 1.7;
+    }
+
+    .glossary-term {
+      white-space: nowrap;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    .glossary-item.love .glossary-term { color: #c4909a; }
+    .glossary-item.phil .glossary-term { color: #8090b8; }
+    .glossary-item.end  .glossary-term { color: #80a880; }
+
+    .glossary-desc { color: #a89878; }
+
+    /* ──── フッター装飾 ──── */
+    .footer-deco {
+      margin-top: 28px;
+      color: #c4a55a55;
+      font-size: 0.7rem;
+      letter-spacing: 0.5em;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- コロネード（柱廊） -->
+  <div class="colonnade">
+    <div class="col"></div>
+    <div class="col"></div>
+    <div class="col"></div>
+    <div class="col"></div>
+    <div class="col"></div>
+    <div class="col"></div>
+    <div class="col"></div>
+    <div class="col"></div>
+    <div class="col"></div>
+  </div>
+  <div class="architrave"></div>
+  <div class="frieze">
+    <div class="frieze-dots">
+      <div class="frieze-dot"></div><div class="frieze-dot"></div>
+      <div class="frieze-dot"></div><div class="frieze-dot"></div>
+      <div class="frieze-dot"></div><div class="frieze-dot"></div>
+      <div class="frieze-dot"></div>
+    </div>
+  </div>
+
+  <div class="header">
+    <div class="deco-line">✦</div>
+    <h1>恋愛哲学ジェネレーター</h1>
+    <p class="subtitle">まじめすぎる恋愛論</p>
+  </div>
+
+  <div class="card">
+    <div class="words-row">
+      <span class="badge badge-love" id="w1">恋愛語</span>
+      <span class="sep" id="s1">×</span>
+      <span class="badge badge-phil" id="w2">哲学概念</span>
+      <span class="sep" id="s2">×</span>
+      <span class="badge badge-end"  id="w3">哲学的結論</span>
+    </div>
+
+    <div class="quote-box">
+      <p class="quote placeholder" id="quote">― ボタンを押すと、深淵が口を開く ―</p>
+    </div>
+
+    <p class="attribution" id="attr"></p>
+
+    <button class="btn" onclick="generate()">▷ &nbsp; 哲学する</button>
+    <p class="counter">生成回数：<span id="count">0</span></p>
+
+    <div class="glossary" id="glossary">
+      <p class="glossary-title">用語解説</p>
+      <div class="glossary-item love">
+        <span class="glossary-term" id="gl-love-term"></span>
+        <span class="glossary-desc"  id="gl-love-desc"></span>
+      </div>
+      <div class="glossary-item phil">
+        <span class="glossary-term" id="gl-phil-term"></span>
+        <span class="glossary-desc"  id="gl-phil-desc"></span>
+      </div>
+      <div class="glossary-item end">
+        <span class="glossary-term" id="gl-end-term"></span>
+        <span class="glossary-desc"  id="gl-end-desc"></span>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer-deco">✦ &nbsp; ✦ &nbsp; ✦</p>
+
+<script>
+  /* ── 単語リスト（十代後半〜二十代前半女性向け） ── */
+  const love = [
+    '既読無視',
+    '急に冷たくなった彼の態度',
+    '「友達に戻ろう」という言葉',
+    '本命ではなかった事実',
+    '告白できないままの日々',
+    '泣いた夜',
+    '忘れられない人',
+    '連絡が途絶えた日',
+    '言えなかった「好き」',
+    'ブロックされた朝',
+    '返信待ちの夜',
+    '秘密の恋',
+    '失恋した日',
+    '彼女になれなかったこと',
+    'ひとりのクリスマス',
+    '他の子に送ってたLINE',
+    '深夜に見るインスタのストーリー',
+    '好きな人の彼女',
+    '二年越しの片思い',
+  ];
+
+  const phil = [
+    '永劫回帰',
+    '実存主義',
+    '弁証法',
+    '虚無主義',
+    '純粋理性',
+    '形而上学',
+    'エロスの哲学',
+    '運命論',
+    'アパテイア',
+    '現象学',
+    '時間の非可逆性',
+    'イデア論',
+    '存在と無',
+    '超越論的自我',
+    'ニヒリズム',
+    '自由意志',
+    'パラドックス',
+    '認識論',
+  ];
+
+  const ending = [
+    'の仮象に過ぎない',
+    'を超越した地平に立つ',
+    'の絶対的否定である',
+    'の自己疎外として現れる',
+    'を根拠づける先験的条件である',
+    'の弁証法的止揚に他ならない',
+    'という永劫回帰を生きることである',
+    'を問い直す契機となる',
+    'の存在論的亀裂を暴露する',
+    'に先立つ不安の様態である',
+    'における自己喪失の一形態である',
+    'の根源的矛盾を体現している',
+    'を乗り越えるべき試練に過ぎない',
+    'という名の哲学的問いである',
+  ];
+
+  const authors = [
+    '— 恋愛論序説（未刊行）',
+    '— 第三回 失恋哲学会 発表要旨',
+    '— 純粋恋愛理性批判 §7',
+    '— ツァラトゥストラはかく語りき（恋愛編）',
+    '— 告白の現象学 第二章',
+    '— 孤独と連帯の弁証法 p.142',
+    '— 嫉妬論考（草稿）',
+    '— 存在と時間・恋愛補遺',
+    '— 失恋の形而上学 序文',
+    '— 片思い研究年報 vol.12',
+    '— 恋愛における不条理 第三稿',
+    '— 感情の純粋批判 付録B',
+  ];
+
+  const templates = [
+    (l, p, e) => `${l}とは、${p}${e}。`,
+    (l, p, e) => `${p}の観点から見れば、${l}は${e}。`,
+    (l, p, e) => `我々が${l}を経験するとき、それは${p}${e}。`,
+    (l, p, e) => `${l}の本質は、${p}${e}。`,
+    (l, p, e) => `あらゆる${l}は、${p}${e}。`,
+    (l, p, e) => `${p}が示す通り、${l}とは${e}。`,
+    (l, p, e) => `いかなる${l}も、究極的には${p}${e}。`,
+    (l, p, e) => `${l}を真剣に問うとき、それは${p}${e}。`,
+    (l, p, e) => `そもそも${l}などというものは、${p}${e}。`,
+    (l, p, e) => `${l}について深く考察するならば、それは${p}${e}。`,
+  ];
+
+  /* ── 用語解説 ── */
+  const loveDesc = {
+    '既読無視':                       '読了の証拠が応答義務を含意するという誤った前提から発生する苦痛の総称。',
+    '急に冷たくなった彼の態度':       '感情状態の不連続的変化を相手の責任として外部帰属する認知的傾向。',
+    '「友達に戻ろう」という言葉':     '関係の再定義を一方的に宣言する行為。当人には退路だが、相手には断崖。',
+    '本命ではなかった事実':           '自己の位置づけが主観と客観で著しく乖離していた状態の事後的認識。',
+    '告白できないままの日々':         '言語化することで不可逆的に確定することへの恐怖による沈黙の持続。',
+    '泣いた夜':                       '情動の過剰が涙腺という出口を経由して身体化された状態。医学的には正常。',
+    '忘れられない人':                 '記憶の想起回路が意志の制御を超えて自律的に稼働し続ける現象。',
+    '連絡が途絶えた日':               '通信の停止が関係性の終焉を意味するという暗黙の了解が成立する瞬間。',
+    '言えなかった「好き」':           '発話可能な状態でありながら発話しなかった、意志と行為の乖離。',
+    'ブロックされた朝':               '存在を技術的手段によって他者の認識から削除される経験。',
+    '返信待ちの夜':                   '不確実な未来への期待を維持するため、現在の苦痛を甘受している状態。',
+    '秘密の恋':                       '公開すれば破綻しうる関係を非開示にすることで継続させる戦略的選択。',
+    '失恋した日':                     '感情的投資の対象が消失した日。経済学的には埋没費用の確定。',
+    '彼女になれなかったこと':         '希望した役割への遷移が叶わなかった経験。身分変化の不成立とも言う。',
+    'ひとりのクリスマス':             '社会的に「共有すべき」とされた日に孤独であることの実存的重さ。',
+    '他の子に送ってたLINE':           '同一メッセージの複数送信という事実が、自己の代替可能性を証明した瞬間。',
+    '深夜に見るインスタのストーリー': '睡眠時間を削って他者の近況を観測する行為。自傷的情報収集とも言える。',
+    '好きな人の彼女':                 '自己が選ばれなかった対比として機能する他者。存在するだけで証拠となる。',
+    '二年越しの片思い':               '感情の持続と報われない期待が積み重なった、時間コストの高い状態。',
+  };
+
+  const philDesc = {
+    '永劫回帰':      'ニーチェの思想実験。同じ人生が無限に繰り返されるとして、それでも肯定できるか。',
+    '実存主義':      '「実存は本質に先立つ」。まず存在し、意味は後から自分でつくるという立場。',
+    '弁証法':        '対立する二項が止揚されより高次の概念に統合されるプロセス。ヘーゲル由来。',
+    '虚無主義':      '価値・意味・目的の根拠は存在しないとする立場。恋愛もその例外ではない。',
+    '純粋理性':      'カントが経験から独立した理性の能力として定義したもの。感情とは対極にある。',
+    '形而上学':      '感覚を超えた存在の究極的な在り方を問う哲学領域。答えは出ないことが多い。',
+    'エロスの哲学':  'プラトンが説いた愛の概念。肉体的な欲求から精神的な美の探求へ昇華される。',
+    '運命論':        'すべての出来事は必然であり、自由意志による変更は不可能だとする立場。',
+    'アパテイア':    'ストア哲学における、欲情や恐怖から解放された魂の平静状態。恋愛とは対極。',
+    '現象学':        '意識に現れる現象をそのまま記述しようとするフッサール発の哲学的方法論。',
+    '時間の非可逆性':'過去は変更不能であるという物理的・哲学的事実。「あのとき」は戻らない。',
+    'イデア論':      'プラトンによる、感覚世界の背後にある永遠不変の本質的形相。理想とも言う。',
+    '存在と無':      'ハイデガーおよびサルトルが論じた、存在することと無であることの根本的対立。',
+    '超越論的自我':  'カントが想定した、あらゆる経験を可能にする先験的な認識の主体。',
+    'ニヒリズム':    '何も意味を持たないとする虚無の立場。しかし失恋後に共感しやすいとも言われる。',
+    '自由意志':      '人は自らの意志で選択できるという考え。「なぜ彼を好きになったか」の説明を拒む。',
+    'パラドックス':  '正しい前提から論理的に導かれるにもかかわらず、直感に反する矛盾した結論のこと。',
+    '認識論':        '我々はいかにして何かを「知る」のかを問う哲学の分野。好意の確信も例外ではない。',
+  };
+
+  const endDesc = {
+    'の仮象に過ぎない':               'それは真実ではなく、表面的な見かけに過ぎないということ。',
+    'を超越した地平に立つ':           'それを乗り越えた、より高い次元にたどり着くということ。',
+    'の絶対的否定である':             'それを根本から否定する性質を持つということ。',
+    'の自己疎外として現れる':         '本来の自己から乖離した状態として顕現するということ。',
+    'を根拠づける先験的条件である':   'それが成立するための、経験以前の必要条件だということ。',
+    'の弁証法的止揚に他ならない':     '矛盾を乗り越えてより高次の状態へ統合されることだということ。',
+    'という永劫回帰を生きることである':'それが永遠に繰り返されると仮定しても受け入れることだということ。',
+    'を問い直す契機となる':           'それについての問いを根本から見直すきっかけになるということ。',
+    'の存在論的亀裂を暴露する':       '存在の深部に潜む矛盾・亀裂を白日のもとにさらすということ。',
+    'に先立つ不安の様態である':       'それが生じる前から漂う、根源的な不安の形だということ。',
+    'における自己喪失の一形態である': 'その状況の中で自分が何者かわからなくなることだということ。',
+    'の根源的矛盾を体現している':     'そのものが、解決できない深い矛盾をそのまま抱えているということ。',
+    'を乗り越えるべき試練に過ぎない': '苦しいが、それは成長のための一時的な障害に過ぎないということ。',
+    'という名の哲学的問いである':     'それは単なる感情ではなく、根本的な問いかけそのものだということ。',
+  };
+
+  let count = 0;
+
+  function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+  function generate() {
+    const w1 = document.getElementById('w1');
+    const w2 = document.getElementById('w2');
+    const w3 = document.getElementById('w3');
+    const s1 = document.getElementById('s1');
+    const s2 = document.getElementById('s2');
+    const q  = document.getElementById('quote');
+    const at = document.getElementById('attr');
+    const gl = document.getElementById('glossary');
+
+    [w1, w2, w3, s1, s2].forEach(el => el.classList.remove('show'));
+    q.classList.remove('show', 'placeholder');
+    at.classList.remove('show');
+    gl.classList.remove('show');
+
+    const lw = pick(love);
+    const pw = pick(phil);
+    // pw の語がew の文字列に含まれると文中で同じ語が2回出て冗長になるため再抽選
+    let ew = pick(ending);
+    let retry = 0;
+    while (ew.includes(pw) && retry++ < 10) ew = pick(ending);
+    const sentence = pick(templates)(lw, pw, ew);
+    const credit = pick(authors);
+
+    setTimeout(() => {
+      w1.textContent = lw;
+      w2.textContent = pw;
+      w3.textContent = ew;
+      [w1, s1, w2, s2, w3].forEach(el => el.classList.add('show'));
+
+      function wrapOnce(html, word, cls) {
+        const idx = html.indexOf(word);
+        if (idx === -1) return html;
+        return html.slice(0, idx)
+          + `<span class="${cls}">${word}</span>`
+          + html.slice(idx + word.length);
+      }
+
+      let html = sentence
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      html = wrapOnce(html, lw, 'hl-love');
+      html = wrapOnce(html, pw, 'hl-phil');
+      html = wrapOnce(html, ew, 'hl-end');
+
+      q.innerHTML = html;
+      q.classList.add('show');
+
+      at.textContent = credit;
+      at.classList.add('show');
+
+      document.getElementById('gl-love-term').textContent = lw;
+      document.getElementById('gl-love-desc').textContent = loveDesc[lw] ?? '';
+      document.getElementById('gl-phil-term').textContent = pw;
+      document.getElementById('gl-phil-desc').textContent = philDesc[pw] ?? '';
+      document.getElementById('gl-end-term').textContent  = ew;
+      document.getElementById('gl-end-desc').textContent  = endDesc[ew] ?? '';
+      gl.classList.add('show');
+
+      count++;
+      document.getElementById('count').textContent = count;
+    }, 80);
+  }
+</script>
+
+</body>
+</html>
