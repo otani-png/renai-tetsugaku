@@ -7,6 +7,9 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
+    /* 横スクロール防止 */
+    html { overflow-x: hidden; }
+
     body {
       min-height: 100vh;
       display: flex;
@@ -14,6 +17,7 @@
       align-items: center;
       justify-content: flex-start;
       padding: 0 16px 64px;
+      max-width: 100%;
       font-family: 'Georgia', '游明朝', 'YuMincho', serif;
       color: #2d2416;
       background-color: #ede8df;
@@ -92,6 +96,8 @@
       color: #2d2416;
       margin-bottom: 8px;
       text-indent: 0.45em; /* letter-spacing 分の視覚補正 */
+      max-width: 100%;      /* 横はみ出し防止 */
+      overflow: hidden;
     }
 
     .subtitle {
@@ -509,6 +515,9 @@
 
     /* ──── レスポンシブ ──── */
     @media (max-width: 900px) {
+      /* sticky パネルを使わないモバイルでは body も横スクロール封じ */
+      body { overflow-x: hidden; }
+
       .page-layout {
         grid-template-columns: 1fr;
       }
@@ -560,7 +569,7 @@
     /* さらに狭い画面向け微調整 */
     @media (max-width: 480px) {
       body { padding-bottom: 40px; }
-      h1   { font-size: 1.3rem; letter-spacing: 0.3em; }
+      h1   { font-size: 1.3rem; letter-spacing: 0.3em; text-indent: 0.3em; }
       .quote { font-size: 1.05rem; line-height: 2.0; }
       /* 引用がさらに折り返しやすいため高さを追加 */
       .card.active .quote-box { height: 260px; }
