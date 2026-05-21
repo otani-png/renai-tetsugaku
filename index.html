@@ -450,7 +450,7 @@
     }
     .left-panel > div,
     .right-panel > div {
-      animation: fadeUp 0.5s ease-out 0.72s backwards;
+      animation: fadeUp 0.5s ease-out 0.65s backwards;
     }
 
     /* ──── レスポンシブ ──── */
@@ -488,6 +488,29 @@
       .left-panel   { order: 2; }
       .card         { order: 1; }
       .right-panel  { order: 3; }
+
+      /* カードの余白をスマホ向けに詰める */
+      .card {
+        padding: 28px 20px 24px;
+      }
+      /* 押した後の引用ボックス：スマホは行折り返しが増えるため高さを広げる */
+      .card.active .quote-box {
+        height: 240px;
+      }
+      /* 各行間のマージンを少し詰める */
+      .words-row    { margin-bottom: 18px; }
+      .attribution  { margin-bottom: 20px; }
+      .glossary     { margin-top: 20px; }
+    }
+
+    /* さらに狭い画面向け微調整 */
+    @media (max-width: 480px) {
+      body { padding-bottom: 40px; }
+      h1   { font-size: 1.3rem; letter-spacing: 0.3em; }
+      .quote { font-size: 1.05rem; line-height: 2.0; }
+      /* 引用がさらに折り返しやすいため高さを追加 */
+      .card.active .quote-box { height: 260px; }
+      .quote-box { padding: 12px 16px; }
     }
   </style>
 </head>
