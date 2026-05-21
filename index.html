@@ -569,6 +569,20 @@
       /* 引用がさらに折り返しやすいため高さを追加 */
       .card.active .quote-box { height: 260px; }
       .quote-box { padding: 12px 16px; }
+
+      /* ── バッジ行：長い単語は折り返す ── */
+      .words-row {
+        flex-wrap: wrap;       /* 折り返しを許可 */
+        height: auto;          /* 固定高さを解除 */
+        overflow: visible;     /* クリップしない */
+        row-gap: 6px;          /* 折り返し時の行間 */
+        align-items: center;
+      }
+      .badge {
+        flex: 0 1 auto;        /* 自然な幅・縮小可・拡大しない */
+        max-width: 100%;       /* コンテナ幅を超えない */
+        text-overflow: clip;   /* 折り返し時は全文見えるので ellipsis 不要 */
+      }
     }
   </style>
 </head>
