@@ -312,14 +312,14 @@
     }
 
     .profile-icon {
-      width: 48px;
-      height: 48px;
+      width: 72px;
+      height: 72px;
       border-radius: 50%;
       border: 1px solid #d4c8b0;
       display: block;
-      margin: 0 auto 14px;
-      opacity: 0.85;
-      filter: sepia(0.15);
+      margin: 0 auto 16px;
+      opacity: 0.88;
+      filter: sepia(0.1);
       transition: opacity 0.2s;
     }
 
@@ -697,19 +697,19 @@
 
   /* ──── カウンター ──── */
   const COUNT_KEY   = 'renai-tetsugaku-mycount';
-  const COUNTER_API = 'https://api.countapi.xyz/hit/otanipng-renai-tetsugaku/generate';
-  const COUNTER_GET = 'https://api.countapi.xyz/get/otanipng-renai-tetsugaku/generate';
+  const COUNTER_GET = 'https://api.counterapi.dev/v1/otanipng/renai-tetsugaku/';
+  const COUNTER_UP  = 'https://api.counterapi.dev/v1/otanipng/renai-tetsugaku/up';
 
   let myCount = parseInt(localStorage.getItem(COUNT_KEY) || '0');
   document.getElementById('my-count').textContent = myCount;
 
-  // ページ読み込み時にグローバルカウントを取得（加算なし）
+  // ページ読み込み時にグローバルカウントを表示（加算なし）
   (async () => {
     try {
-      const r = await fetch(COUNTER_GET, { signal: AbortSignal.timeout(4000) });
+      const r = await fetch(COUNTER_GET, { signal: AbortSignal.timeout(5000) });
       const d = await r.json();
       document.getElementById('global-count').textContent =
-        (d.value || 0).toLocaleString('ja-JP');
+        (d.count || 0).toLocaleString('ja-JP');
     } catch {
       document.getElementById('global-count').textContent = '---';
     }
@@ -717,10 +717,10 @@
 
   async function incrementGlobal() {
     try {
-      const r = await fetch(COUNTER_API, { signal: AbortSignal.timeout(4000) });
+      const r = await fetch(COUNTER_UP, { signal: AbortSignal.timeout(5000) });
       const d = await r.json();
       document.getElementById('global-count').textContent =
-        (d.value || 0).toLocaleString('ja-JP');
+        (d.count || 0).toLocaleString('ja-JP');
     } catch {
       document.getElementById('global-count').textContent = '---';
     }
