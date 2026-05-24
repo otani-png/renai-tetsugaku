@@ -379,6 +379,14 @@
       font-size: 0.62rem;
       letter-spacing: 0.18em;
       color: #b4a888;
+      margin-bottom: 4px;
+    }
+
+    .profile-bio {
+      font-size: 0.6rem;
+      letter-spacing: 0.12em;
+      color: #c4b89a;
+      line-height: 1.7;
       margin-bottom: 16px;
     }
 
@@ -541,7 +549,9 @@
         max-width: 680px;
       }
       .profile-icon { margin: 0; width: 52px; height: 52px; }
-      .profile-name { margin-bottom: 0; }
+      .profile-text { flex: 1; min-width: 0; }
+      .profile-name { margin-bottom: 2px; }
+      .profile-bio  { margin-bottom: 0; }
       .side-social  { flex-direction: row; border-top: none; padding-top: 0; border-left: 1px solid #e8e0d0; padding-left: 16px; }
       .left-panel   { order: 2; }
       .card         { order: 1; }
@@ -663,8 +673,11 @@
       <div class="profile-block">
         <img class="profile-icon"
              src="https://github.com/otani-png.png"
-             alt="otanibigvalley のアイコン">
-        <p class="profile-name">otanibigvalley</p>
+             alt="大谷書工房 のアイコン">
+        <div class="profile-text">
+          <p class="profile-name">大谷書工房</p>
+          <p class="profile-bio">積読好きの文系大学生</p>
+        </div>
         <div class="side-social">
           <a href="https://note.com/otanibigvalley" target="_blank" rel="noopener">note</a>
           <a href="https://x.com/Otanibigvalley"    target="_blank" rel="noopener">X</a>
