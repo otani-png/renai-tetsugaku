@@ -3,7 +3,33 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>恋愛哲学ジェネレーター</title>
+
+  <!-- ── 基本メタ / SEO ── -->
+  <title>恋愛哲学ジェネレーター｜まじめすぎる恋愛論</title>
+  <meta name="description" content="既読無視も失恋も、哲学の言葉にかかれば荘厳な命題になる。ボタンひとつで“まじめすぎる恋愛論”を無限に生成するジェネレーター。">
+  <meta name="author" content="大谷書工房">
+  <meta name="theme-color" content="#c4a55a">
+  <link rel="canonical" href="https://otani-png.github.io/renai-tetsugaku/">
+
+  <!-- ── OGP（SNSシェア時の見た目） ── -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="恋愛哲学ジェネレーター">
+  <meta property="og:title" content="恋愛哲学ジェネレーター｜まじめすぎる恋愛論">
+  <meta property="og:description" content="既読無視も失恋も、哲学の言葉にかかれば荘厳な命題になる。ボタンひとつで“まじめすぎる恋愛論”を無限に生成。">
+  <meta property="og:url" content="https://otani-png.github.io/renai-tetsugaku/">
+  <meta property="og:locale" content="ja_JP">
+  <!-- og:image は未設定。カード用画像を用意したら下記2行を追加し、twitter:card を summary_large_image に変更するとサムネ付きになる。
+       <meta property="og:image" content="https://otani-png.github.io/renai-tetsugaku/ogp.png"> -->
+
+  <!-- ── Twitter Card（画像未設定のため summary。画像を足したら summary_large_image に） ── -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="恋愛哲学ジェネレーター｜まじめすぎる恋愛論">
+  <meta name="twitter:description" content="既読無視も失恋も、哲学の言葉にかかれば荘厳な命題になる。">
+  <meta name="twitter:creator" content="@Otanibigvalley">
+
+  <!-- ── favicon（列柱の絵文字。外部ファイル不要のインラインSVG） ── -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#127963;&#65039;</text></svg>">
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -594,6 +620,16 @@
         text-overflow: clip;   /* 折り返し時は全文見えるので ellipsis 不要 */
       }
     }
+
+    /* ── アニメーションを控えたい人向け（酔い・眩暈対策） ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -639,12 +675,12 @@
       </div>
 
       <div class="quote-box">
-        <p class="quote placeholder show" id="quote">― 深淵を覗く ―</p>
+        <p class="quote placeholder show" id="quote" aria-live="polite" aria-atomic="true">― 深淵を覗く ―</p>
       </div>
 
       <p class="attribution" id="attr"></p>
 
-      <button class="btn" onclick="generate()">▷ &nbsp; 哲学する</button>
+      <button class="btn" type="button" onclick="generate()">▷ &nbsp; 哲学する</button>
 
       <div class="counter">
         <span class="counter-label">汝 の 思 索</span>
@@ -879,6 +915,8 @@
   function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
   const card = document.querySelector('.card');
+  // アニメを控えたい設定のユーザーには砂散らし等を出さない
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // オープニングアニメーション：柱を左から右へ段階的に落とす
   document.querySelectorAll('.col').forEach((col, i) => {
@@ -959,7 +997,7 @@
       }));
     }
 
-    if (isFirst) {
+    if (isFirst && !prefersReducedMotion) {
       // ── 初回：「深淵を覗く」の文字を砂のように飛ばす ──
       const text = q.textContent;
 
@@ -1015,6 +1053,10 @@
 
       // 散らし完了後にコンテンツ差し替え
       setTimeout(swapAndReveal, 480);
+
+    } else if (isFirst) {
+      // reduced-motion 設定時：砂散らしを飛ばして即座に表示
+      swapAndReveal();
 
     } else {
       // ── 2回目以降：靄フロー ──
