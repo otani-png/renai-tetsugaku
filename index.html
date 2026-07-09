@@ -446,6 +446,28 @@
     .counter-label { font-size: 0.6rem; letter-spacing: 0.25em; color: #d4c8b0; display: block; margin-bottom: 4px; }
     .counter-num   { font-size: 0.95rem; color: #a89060; letter-spacing: 0.08em; }
 
+    /* ──── シェアリンク ──── */
+    .share-row {
+      text-align: center;
+      margin-top: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease 0.6s;   /* 用語解説と足並みを揃えて遅れて出す */
+    }
+    .share-row.show { opacity: 1; pointer-events: auto; }
+
+    .share-x {
+      display: inline-block;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      color: #9a8060;
+      text-decoration: none;
+      border: 1px solid #e4dac8;
+      padding: 7px 18px;
+      transition: color 0.2s, background 0.2s, border-color 0.2s;
+    }
+    .share-x:hover { color: #faf8f3; background: #c4a55a; border-color: #c4a55a; }
+
     /* ──── 用語解説 ──── */
     .glossary {
       margin-top: 28px;
@@ -685,6 +707,11 @@
       <div class="counter">
         <span class="counter-label">汝 の 思 索</span>
         <span class="counter-num" id="my-count">0</span>
+      </div>
+
+      <!-- 生成した一節をシェア（初回生成後に表示） -->
+      <div class="share-row" id="share-row">
+        <a class="share-x" id="share-x" href="#" target="_blank" rel="noopener">𝕏 &nbsp; この一節をシェア</a>
       </div>
 
       <div class="glossary" id="glossary">
@@ -969,6 +996,15 @@
 
       q.innerHTML    = html;
       at.textContent = credit;
+
+      // シェア用リンクを現在の一節で更新（ツイート本文＝生成文＋出典＋サイトURL）
+      const shareText = `${sentence}\n${credit}`;
+      const shareIntent = 'https://twitter.com/intent/tweet?text='
+        + encodeURIComponent(shareText)
+        + '&url=' + encodeURIComponent('https://otani-png.github.io/renai-tetsugaku/')
+        + '&hashtags=' + encodeURIComponent('恋愛哲学ジェネレーター');
+      document.getElementById('share-x').href = shareIntent;
+
       w1.textContent = lw;
       w2.textContent = pw;
       w3.textContent = ew;
@@ -988,6 +1024,7 @@
         q.classList.add('show');
         at.classList.add('show');
         gl.classList.add('show');
+        document.getElementById('share-row').classList.add('show');
         card.classList.remove('transitioning'); // 靄を晴らす（2回目以降）
 
         myCount++;
