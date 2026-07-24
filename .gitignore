@@ -1,0 +1,21 @@
+# APIキー・秘密情報
+.env
+.env.local
+.env.*.local
+
+# OSが自動生成するファイル
+.DS_Store
+Thumbs.db
+
+# エディタの設定ファイル
+.vscode/
+.idea/
+
+# アーキの作業用（絶対パスなど内輪の情報が入るため公開しない）
+.claude/
+
+# 編集中のバックアップ
+*.bak
+
+# Node.jsを使う場合
+node_modules/
